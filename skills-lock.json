@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "skills": {
+    "grill-me": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "computedHash": "d85881e7b2f6e9c718d45ac9954c1d8e05e21f9b6f3ca58062ae80f89474750b"
+    },
+    "prd-to-issues": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "computedHash": "bf716dcf8babe700d05bb62892a1f6630d03044e0e04bac0c03780bd6508da5f"
+    },
+    "prd-to-plan": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "computedHash": "b602c684d70f1a27bce4d9db8fe5cca15e2923c083d6e4e6eda9d3fc0895afed"
+    },
+    "tdd": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "computedHash": "e4453d2f51a009f6b49876cc4d46ce452194c54ea931d4a552a0eb0e9dd24c27"
+    },
+    "write-a-prd": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "computedHash": "d4234a2ebcf89b745a9e33f7e0831aef6ff5cbe48f91db54796ae7cd897d78a8"
+    }
+  }
+}
