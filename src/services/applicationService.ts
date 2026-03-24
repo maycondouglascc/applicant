@@ -4,6 +4,9 @@ export interface Application {
   status: 'Backlog' | 'Active' | 'Archived' // Based on PRD
   keywords: string[]
   suggested_snippet_ids: string[]
+  tailored_cv?: string
+  tailored_cl?: string
+  linkedin_msg?: string
   created_at: string
 }
 
@@ -11,6 +14,9 @@ export interface CreateApplicationData {
   job_description: string
   keywords: string[]
   suggested_snippet_ids: string[]
+  tailored_cv?: string
+  tailored_cl?: string
+  linkedin_msg?: string
 }
 
 const STORAGE_KEY = 'applicant_applications'
@@ -36,6 +42,9 @@ export function createApplication(data: CreateApplicationData): Application {
     job_description: data.job_description,
     keywords: data.keywords,
     suggested_snippet_ids: data.suggested_snippet_ids,
+    tailored_cv: data.tailored_cv,
+    tailored_cl: data.tailored_cl,
+    linkedin_msg: data.linkedin_msg,
     status: 'Backlog',
     created_at: new Date().toISOString(),
   }
@@ -50,4 +59,14 @@ export function getApplications(): Application[] {
 
 export function getApplication(id: string): Application | undefined {
   return readStore().find((a) => a.id === id)
+}
+
+export function updateApplication(id: string, updates: Partial<Application>): Application | undefined {
+  const apps = readStore()
+  const index = apps.findIndex((a) => a.id === id)
+  if (index === -1) return undefined
+  
+  apps[index] = { ...apps[index], ...updates }
+  writeStore(apps)
+  return apps[index]
 }

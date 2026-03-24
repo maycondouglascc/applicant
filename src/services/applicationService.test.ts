@@ -2,6 +2,7 @@ import {
   createApplication,
   getApplications,
   getApplication,
+  updateApplication
 } from './applicationService'
 
 describe('applicationService', () => {
@@ -59,5 +60,27 @@ describe('applicationService', () => {
 
   it('returns undefined for non-existent application', () => {
     expect(getApplication('does-not-exist')).toBeUndefined()
+  })
+
+  // Cycle 4
+  it('updates an existing application', () => {
+    const app = createApplication({
+      job_description: 'JD to update',
+      keywords: [],
+      suggested_snippet_ids: [],
+    })
+
+    const updated = updateApplication(app.id, {
+      tailored_cv: 'New CV Content',
+      status: 'Active',
+    })
+
+    expect(updated).toBeDefined()
+    expect(updated?.tailored_cv).toBe('New CV Content')
+    expect(updated?.status).toBe('Active')
+
+    const found = getApplication(app.id)
+    expect(found?.tailored_cv).toBe('New CV Content')
+    expect(found?.status).toBe('Active')
   })
 })

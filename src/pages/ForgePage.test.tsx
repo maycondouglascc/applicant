@@ -18,16 +18,18 @@ vi.mock('@/services/snippetService', () => ({
   getSnippets: vi.fn().mockReturnValue([])
 }))
 
+vi.mock('@/services/geminiService', () => ({
+  generateTailoredContent: vi.fn().mockResolvedValue({
+    cv: 'Mocked CV text',
+    cl: 'Mocked CL text',
+    linkedin: 'Mocked LI text'
+  })
+}))
+
 describe('ForgePage', () => {
   beforeEach(() => {
     localStorage.clear()
-    vi.spyOn(global, 'fetch').mockResolvedValue({
-      ok: true,
-      headers: { entries: () => [] },
-      json: async () => ({
-        candidates: [{ content: { parts: [{ text: '["React", "Node"]' }] } }]
-      })
-    } as any)
+    localStorage.setItem('applicant_gemini_api_key', 'test-key')
   })
 
   afterEach(() => {
@@ -56,7 +58,6 @@ describe('ForgePage', () => {
     expect(button.disabled).toBe(false)
   })
 
-  // Cycle 7 & 8: Loading, Keywords, Snippets
   it('extracts keywords and shows ranked snippets on submit', async () => {
     render(<ForgePage />)
     const input = screen.getByPlaceholderText(/Paste the Job Description here.../i)
@@ -65,41 +66,69 @@ describe('ForgePage', () => {
     fireEvent.change(input, { target: { value: 'Looking for React and Node' } })
     fireEvent.click(analyzeBtn)
 
-    // Should show loading state (we'll look for 'Extracting skills...' text)
     expect(screen.getByText(/Extracting skills.../i)).toBeDefined()
 
-    // Wait for mock resolution
     await waitFor(() => {
-      // Mocked extractKeywords returns explicit keywords
       expect(screen.getByText('React')).toBeDefined()
       expect(screen.getByText('Node')).toBeDefined()
     })
 
-    // Assert mocked snippets appear
     expect(screen.getByText('Frontend Skills')).toBeDefined()
     expect(screen.getByText('Backend Skills')).toBeDefined()
     
-    // Save to Backlog button should now appear
-    expect(screen.getByRole('button', { name: /Save to Backlog/i })).toBeDefined()
+    expect(screen.getByRole('button', { name: /Generate Content/i })).toBeDefined()
   })
 
-  // Cycle 9: Persist application
-  it('saves the application to backlog and flashes success', async () => {
+  it('generates tailored content and displays the Diff View', async () => {
     render(<ForgePage />)
     const input = screen.getByPlaceholderText(/Paste the Job Description here.../i)
     const analyzeBtn = screen.getByRole('button', { name: /Analyze JD/i })
     
-    fireEvent.change(input, { target: { value: 'Looking for React and Node' } })
+    fireEvent.change(input, { target: { value: 'JD' } })
     fireEvent.click(analyzeBtn)
 
     await waitFor(() => {
-      expect(screen.getByText('React')).toBeDefined()
+      expect(screen.getByRole('button', { name: /Generate Content/i })).toBeDefined()
     })
 
-    const saveBtn = screen.getByRole('button', { name: /Save to Backlog/i })
+    const generateBtn = screen.getByRole('button', { name: /Generate Content/i })
+    fireEvent.click(generateBtn)
+
+    await waitFor(() => {
+      expect(screen.getByText('Review & Edit')).toBeDefined()
+    })
+
+    expect(screen.getByText('Source Snippets')).toBeDefined()
+    
+    // Check tabs
+    expect(screen.getByText('Tailored CV')).toBeDefined()
+    expect(screen.getByText('Cover Letter')).toBeDefined()
+    expect(screen.getByText('LinkedIn Message')).toBeDefined()
+
+    // Assert textareas render with mocked value
+    expect(screen.getAllByDisplayValue(/Mocked CV text|Mocked CL text|Mocked LI text/i).length).toBeGreaterThan(0)
+  })
+
+  it('saves the application from the diff view and flashes success', async () => {
+    render(<ForgePage />)
+    const input = screen.getByPlaceholderText(/Paste the Job Description here.../i)
+    
+    fireEvent.change(input, { target: { value: 'JD' } })
+    fireEvent.click(screen.getByRole('button', { name: /Analyze JD/i }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Generate Content/i })).toBeDefined()
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: /Generate Content/i }))
+
+    await waitFor(() => {
+      expect(screen.getByText('Review & Edit')).toBeDefined()
+    })
+
+    const saveBtn = screen.getByRole('button', { name: /Save Application/i })
     fireEvent.click(saveBtn)
 
-    // Should show success or clear the form
-    expect(screen.getByText(/Saved to Backlog/i)).toBeDefined()
+    expect(screen.getByText(/Saved Application to Backlog/i)).toBeDefined()
   })
 })
