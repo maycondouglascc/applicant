@@ -1,73 +1,37 @@
-# React + TypeScript + Vite
+# Applicant: Command Center for the Job Hunt
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Applicant is a personal, high-density professional utility designed to streamline the job hunt. It acts as a "Command Center" and "Forge" for tailoring resumes, cover letters, and outreach messages to specific job descriptions using AI (Gemini).
 
-Currently, two official plugins are available:
+> [!IMPORTANT]
+> **AI Agents: Read [context.md](file:///c:/Users/mcmay/Documents/Coding/applicant/applicant/context.md) first to get contextualized in the project.**
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🛠️ Tech Stack
 
-## React Compiler
+- **Frontend:** [Vite](https://vitejs.dev/) + [React](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/) + [Shadcn UI](https://ui.shadcn.com/)
+- **Database / Auth:** [Supabase](https://supabase.com/)
+- **AI Integration:** [Google Gemini SDK](https://ai.google.dev/gemini-api/docs/quickstart?lang=node)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 📁 Project Structure
 
-## Expanding the ESLint configuration
+- `context/`: Project mission, roadmap, technical specs, and feature breakdowns.
+- `src/`: React source code (components, hooks, pages, etc.).
+- `public/`: Static assets.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🚀 Getting Started
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+1.  **Read Context**: Refer to `context.md` for a full overview of the project and current roadmap.
+2.  **Environment Setup**: (Instructions coming soon)
+3.  **Local Development**:
+    ```bash
+    npm run dev
+    ```
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## 🧠 Core Philosophy
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- **High Density**: UI optimized for information density, not whitespace.
+- **ATS First**: Exports are strictly structured for ATS compatibility (no "pretty" templates).
+- **Control**: User-driven AI tailoring with a side-by-side Diff editor for review.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
+*Created by [Maycon Douglas](https://github.com/maycondouglascc)*
