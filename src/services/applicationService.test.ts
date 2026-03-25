@@ -2,7 +2,8 @@ import {
   createApplication,
   getApplications,
   getApplication,
-  updateApplication
+  updateApplication,
+  archiveStaleApplications,
 } from './applicationService'
 
 describe('applicationService', () => {
@@ -83,4 +84,84 @@ describe('applicationService', () => {
     expect(found?.tailored_cv).toBe('New CV Content')
     expect(found?.status).toBe('Active')
   })
+
+  // --- S1: Extended fields ---
+  it('creates an application with company, role, priority, checklist, private_notes, and updated_at', () => {
+    const app = createApplication({
+      job_description: 'Senior Product Designer',
+      keywords: [],
+      suggested_snippet_ids: [],
+      company: 'Acme Corp',
+      role: 'Senior Product Designer',
+      priority: 'High',
+    })
+
+    expect(app.company).toBe('Acme Corp')
+    expect(app.role).toBe('Senior Product Designer')
+    expect(app.priority).toBe('High')
+    expect(app.private_notes).toBe('')
+    expect(app.updated_at).toBeDefined()
+    expect(app.checklist).toEqual({
+      tailor_cv: false,
+      tailor_cl: false,
+      sent_li: false,
+      applied: false,
+      response: false,
+    })
+  })
+
+  it('defaults priority to Medium and company/role to empty string when omitted', () => {
+    const app = createApplication({
+      job_description: 'Generic JD',
+      keywords: [],
+      suggested_snippet_ids: [],
+    })
+
+    expect(app.priority).toBe('Medium')
+    expect(app.company).toBe('')
+    expect(app.role).toBe('')
+  })
+
+  // --- S2: archiveStaleApplications archives Applied apps older than 30 days ---
+  it('archives Applied applications whose updated_at is older than 30 days', () => {
+    const staleDate = new Date()
+    staleDate.setDate(staleDate.getDate() - 31)
+
+    const app = createApplication({
+      job_description: 'Old Applied JD',
+      keywords: [],
+      suggested_snippet_ids: [],
+    })
+    updateApplication(app.id, {
+      status: 'Applied',
+      updated_at: staleDate.toISOString(),
+    })
+
+    archiveStaleApplications()
+
+    const found = getApplication(app.id)
+    expect(found?.status).toBe('Archived')
+  })
+
+  // --- S3: archiveStaleApplications leaves fresh Applied apps untouched ---
+  it('does not archive Applied applications updated within the last 30 days', () => {
+    const recentDate = new Date()
+    recentDate.setDate(recentDate.getDate() - 5)
+
+    const app = createApplication({
+      job_description: 'Recent Applied JD',
+      keywords: [],
+      suggested_snippet_ids: [],
+    })
+    updateApplication(app.id, {
+      status: 'Applied',
+      updated_at: recentDate.toISOString(),
+    })
+
+    archiveStaleApplications()
+
+    const found = getApplication(app.id)
+    expect(found?.status).toBe('Applied')
+  })
 })
+
