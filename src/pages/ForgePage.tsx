@@ -22,6 +22,8 @@ import { getSnippets } from '@/services/snippetService'
 import type { Snippet } from '@/services/snippetService'
 import { createApplication } from '@/services/applicationService'
 import { generateTailoredContent, type TailoredContent } from '@/services/geminiService'
+import { DownloadIcon } from 'lucide-react'
+import { downloadAsPdf } from '@/services/pdfExportService'
 
 export function ForgePage() {
   const [jdText, setJdText] = useState('')
@@ -32,6 +34,7 @@ export function ForgePage() {
   const [tailored, setTailored] = useState<TailoredContent | null>(null)
   const [successMsg, setSuccessMsg] = useState('')
   const [errorMsg, setErrorMsg] = useState('')
+  const [isPdfLoading, setIsPdfLoading] = useState(false)
 
   const handleAnalyze = async () => {
     setIsLoading(true)
@@ -85,6 +88,20 @@ export function ForgePage() {
     }
   }
 
+  const handleDownloadPdf = async () => {
+    if (!tailored?.cv) return
+    setIsPdfLoading(true)
+    setErrorMsg('')
+    try {
+      await downloadAsPdf(tailored.cv, 'ATS_Tailored_CV.pdf')
+    } catch (err: any) {
+      console.error(err)
+      setErrorMsg('Error generating PDF: ' + (err?.message || String(err)))
+    } finally {
+      setIsPdfLoading(false)
+    }
+  }
+
   if (tailored) {
     return (
       <div className="container h-[calc(100vh-4rem)] mx-auto py-8 flex flex-col gap-4">
@@ -93,7 +110,13 @@ export function ForgePage() {
             <h1 className="text-2xl font-bold tracking-tight">Review & Edit</h1>
             <p className="text-muted-foreground">Compare the generated text with your source snippets.</p>
           </div>
-          <Button onClick={handleSave}>Save Application</Button>
+          <div className="flex gap-2">
+            <Button variant="secondary" onClick={handleDownloadPdf} disabled={isPdfLoading}>
+              <DownloadIcon data-icon="inline-start" />
+              {isPdfLoading ? 'Generating PDF...' : 'Download ATS PDF'}
+            </Button>
+            <Button onClick={handleSave}>Save Application</Button>
+          </div>
         </div>
         
         {successMsg && <p className="text-green-600 dark:text-green-400 text-sm font-medium">{successMsg}</p>}
